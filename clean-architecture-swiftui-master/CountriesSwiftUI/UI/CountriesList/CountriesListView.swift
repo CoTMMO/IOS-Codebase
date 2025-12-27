@@ -43,7 +43,7 @@ struct CountriesList: View {
                         }
                     }, sort: \DBModel.Country.name)
                 })
-                .navigationTitle("Countries")
+                .navigationTitle(LocalizedStrings.Countries.title)
         }
         .modifier(LocaleReader(container: localeContainer))
         .onReceive(routingUpdate) { self.routingState = $0 }
@@ -67,7 +67,9 @@ struct CountriesList: View {
 
     @ViewBuilder private var permissionsButton: some View {
         if canRequestPushPermission {
-            Button(action: requestPushPermission, label: { Text("Allow Push") })
+            Button(action: requestPushPermission) {
+                Text(LocalizedStrings.Countries.allowPush)
+            }
         }
     }
 }
@@ -103,7 +105,7 @@ private extension CountriesList {
     @ViewBuilder
     func loadedView() -> some View {
         if countries.isEmpty && !searchText.isEmpty {
-            Text("No matches found")
+            Text(LocalizedStrings.Countries.noMatches)
                 .font(.footnote)
         }
         List(countries, id: \.alpha3Code) { country in
@@ -123,17 +125,17 @@ private extension CountriesList {
                 permissionsButton
             }
         }
-        .onChange(of: routingState.countryCode, initial: true, { _, code in
+        .onChange(of: routingState.countryCode, initial: true) { _, code in
             guard let code,
                   let country = countries.first(where: { $0.alpha3Code == code})
             else { return }
             navigationPath.append(country)
-        })
-        .onChange(of: navigationPath, { _, path in
+        }
+        .onChange(of: navigationPath) { _, path in
             if !path.isEmpty {
                 routingBinding.wrappedValue.countryCode = nil
             }
-        })
+        }
     }
 }
 

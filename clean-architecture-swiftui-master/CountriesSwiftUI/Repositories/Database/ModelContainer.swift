@@ -14,7 +14,12 @@ extension ModelContainer {
         inMemoryOnly: Bool = false, isStub: Bool = false
     ) throws -> ModelContainer {
         let schema = Schema.appSchema
-        let modelConfiguration = ModelConfiguration(isStub ? "stub" : nil, schema: schema, isStoredInMemoryOnly: inMemoryOnly)
+        let configName = isStub ? AppConfiguration.Database.stubName : AppConfiguration.Database.defaultName
+        let modelConfiguration = ModelConfiguration(
+            configName,
+            schema: schema,
+            isStoredInMemoryOnly: inMemoryOnly
+        )
         return try ModelContainer(for: schema, configurations: [modelConfiguration])
     }
 
@@ -23,7 +28,7 @@ extension ModelContainer {
     }
 
     var isStub: Bool {
-        return configurations.first?.name == "stub"
+        return configurations.first?.name == AppConfiguration.Database.stubName
     }
 }
 

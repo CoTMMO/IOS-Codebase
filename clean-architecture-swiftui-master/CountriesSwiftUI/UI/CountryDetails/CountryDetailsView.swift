@@ -37,16 +37,12 @@ struct CountryDetails: View {
     }
     
     @ViewBuilder private var content: some View {
-        switch details {
-        case .notRequested:
-            defaultView()
-        case .isLoading:
-            loadingView()
-        case let .loaded(countryDetails):
-            loadedView(countryDetails)
-        case let .failed(error):
-            failedView(error)
-        }
+        LoadableView(
+            loadable: details,
+            content: loadedView,
+            retryAction: { loadCountryDetails(forceReload: true) },
+            onAppear: { loadCountryDetails(forceReload: false) }
+        )
     }
 }
 
@@ -63,32 +59,6 @@ private extension CountryDetails {
     
     func showCountryDetailsSheet() {
         injected.appState[\.routing.countryDetails.detailsSheet] = true
-    }
-}
-
-// MARK: - Loading Content
-
-private extension CountryDetails {
-    func defaultView() -> some View {
-        Text("").onAppear {
-            loadCountryDetails(forceReload: false)
-        }
-    }
-    
-    func loadingView() -> some View {
-        VStack {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
-            Button(action: {
-                self.details.cancelLoading()
-            }, label: { Text("Cancel loading") })
-        }
-    }
-    
-    func failedView(_ error: Error) -> some View {
-        ErrorView(error: error, retryAction: {
-            self.loadCountryDetails(forceReload: true)
-        })
     }
 }
 
@@ -129,15 +99,15 @@ private extension CountryDetails {
     }
     
     func basicInfoSectionView(countryDetails: DBModel.CountryDetails) -> some View {
-        Section(header: Text("Basic Info")) {
-            DetailRow(leftLabel: Text(country.alpha3Code), rightLabel: "Code")
-            DetailRow(leftLabel: Text("\(country.population)"), rightLabel: "Population")
-            DetailRow(leftLabel: Text("\(countryDetails.capital)"), rightLabel: "Capital")
+        Section(header: Text(LocalizedStrings.CountryDetails.basicInfo)) {
+            DetailRow(leftLabel: Text(country.alpha3Code), rightLabel: LocalizedStrings.CountryDetails.code)
+            DetailRow(leftLabel: Text("\(country.population)"), rightLabel: LocalizedStrings.CountryDetails.population)
+            DetailRow(leftLabel: Text("\(countryDetails.capital)"), rightLabel: LocalizedStrings.CountryDetails.capital)
         }
     }
     
     func currenciesSectionView(currencies: [DBModel.Currency]) -> some View {
-        Section(header: Text("Currencies")) {
+        Section(header: Text(LocalizedStrings.CountryDetails.currencies)) {
             ForEach(currencies) { currency in
                 DetailRow(leftLabel: Text(currency.title), rightLabel: Text(currency.code))
             }
@@ -145,7 +115,7 @@ private extension CountryDetails {
     }
     
     func neighborsSectionView(neighbors: [DBModel.Country]) -> some View {
-        Section(header: Text("Neighboring countries")) {
+        Section(header: Text(LocalizedStrings.CountryDetails.neighbors)) {
             ForEach(neighbors) { country in
                 NavigationLink(destination: self.neighbourDetailsView(country: country)) {
                     DetailRow(leftLabel: Text(country.name(locale: self.locale)), rightLabel: "")

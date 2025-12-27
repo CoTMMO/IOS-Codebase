@@ -32,10 +32,10 @@ extension AppEnvironment {
                     .modelContainer(modelContainer)
                     .attachEnvironmentOverrides(onChange: onChangeHandler)
                     .inject(diContainer)
-                if modelContainer.isStub {
-                    Text("⚠️ There is an issue with local database")
+                    if modelContainer.isStub {
+                    Text(LocalizedStrings.Errors.databaseIssue)
                         .font(.caption2)
-                }
+                    }
             }
         }
     }

@@ -75,7 +75,7 @@ extension ApiModel {
             population = try values.decode(Int.self, forKey: .population)
             if let alpha2orFlagURL = try? values.decode(String.self, forKey: .flag) {
                 let urlString = alpha2orFlagURL.count == 2 ?
-                "https://flagcdn.com/w640/\(alpha2orFlagURL.lowercased()).jpg" : alpha2orFlagURL
+                "\(AppConfiguration.API.flagBaseURL)/\(alpha2orFlagURL.lowercased()).jpg" : alpha2orFlagURL
                 flag = URL(string: urlString)
             } else { flag = nil }
             alpha3Code = try values.decode(String.self, forKey: .alpha3Code)
