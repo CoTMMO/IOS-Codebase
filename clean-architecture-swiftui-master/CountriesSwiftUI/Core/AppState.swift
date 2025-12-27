@@ -19,6 +19,11 @@ extension AppState {
     struct ViewRouting: Equatable {
         var countriesList = CountriesList.Routing()
         var countryDetails = CountryDetails.Routing()
+
+        mutating func reset() {
+            countriesList = CountriesList.Routing()
+            countryDetails = CountryDetails.Routing()
+        }
     }
 }
 

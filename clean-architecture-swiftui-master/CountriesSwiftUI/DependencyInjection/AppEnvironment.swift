@@ -58,11 +58,11 @@ extension AppEnvironment {
 
     private static func configuredURLSession() -> URLSession {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 60
-        configuration.timeoutIntervalForResource = 120
+        configuration.timeoutIntervalForRequest = AppConfiguration.API.Timeout.request
+        configuration.timeoutIntervalForResource = AppConfiguration.API.Timeout.resource
         configuration.waitsForConnectivity = true
-        configuration.httpMaximumConnectionsPerHost = 5
-        configuration.requestCachePolicy = .returnCacheDataElseLoad
+        configuration.httpMaximumConnectionsPerHost = AppConfiguration.Network.maxConnectionsPerHost
+        configuration.requestCachePolicy = AppConfiguration.Network.cachePolicy
         configuration.urlCache = .shared
         return URLSession(configuration: configuration)
     }
@@ -85,7 +85,9 @@ extension AppEnvironment {
         do {
             return try ModelContainer.appModelContainer()
         } catch {
-            // Log the error
+            #if DEBUG
+            print("⚠️ Failed to initialize ModelContainer: \(error.localizedDescription)")
+            #endif
             return ModelContainer.stub
         }
     }

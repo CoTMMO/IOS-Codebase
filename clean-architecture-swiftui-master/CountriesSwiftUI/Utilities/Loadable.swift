@@ -20,16 +20,40 @@ enum Loadable<T> {
 
     var value: T? {
         switch self {
-        case let .loaded(value): return value
-        case let .isLoading(last, _): return last
-        default: return nil
+        case let .loaded(value):
+            return value
+        case let .isLoading(last, _):
+            return last
+        default:
+            return nil
         }
     }
+
     var error: Error? {
         switch self {
-        case let .failed(error): return error
-        default: return nil
+        case let .failed(error):
+            return error
+        default:
+            return nil
         }
+    }
+
+    var isLoading: Bool {
+        if case .isLoading = self {
+            return true
+        }
+        return false
+    }
+
+    var isLoaded: Bool {
+        if case .loaded = self {
+            return true
+        }
+        return false
+    }
+
+    var hasValue: Bool {
+        return value != nil
     }
 }
 

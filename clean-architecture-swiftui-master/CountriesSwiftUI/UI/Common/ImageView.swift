@@ -27,16 +27,11 @@ struct ImageView: View {
     }
     
     @ViewBuilder private var content: some View {
-        switch image {
-        case .notRequested:
-            defaultView()
-        case .isLoading:
-            loadingView()
-        case let .loaded(image):
-            loadedView(image)
-        case let .failed(error):
-            failedView(error)
-        }
+        LoadableView(
+            loadable: image,
+            content: loadedView,
+            onAppear: loadImage
+        )
     }
 }
 
@@ -52,24 +47,6 @@ private extension ImageView {
 // MARK: - Content
 
 private extension ImageView {
-    func defaultView() -> some View {
-        Text("").onAppear {
-            self.loadImage()
-        }
-    }
-    
-    func loadingView() -> some View {
-        ProgressView()
-            .progressViewStyle(CircularProgressViewStyle())
-    }
-    
-    func failedView(_ error: Error) -> some View {
-        Text("Unable to load image")
-            .font(.footnote)
-            .multilineTextAlignment(.center)
-            .padding()
-    }
-    
     func loadedView(_ uiImage: UIImage) -> some View {
         Image(uiImage: uiImage)
             .resizable()
