@@ -23,7 +23,39 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        // Setup optimized application launch
+        setupApplicationLaunch()
         return true
+    }
+
+    private func setupApplicationLaunch() {
+        // Configure application for optimal performance
+        configureApplicationPerformance()
+        
+        // Setup memory management
+        setupMemoryWarningObserver()
+    }
+    
+    private func configureApplicationPerformance() {
+        // Optimize application performance settings
+        UIApplication.shared.isIdleTimerDisabled = false
+        UIApplication.shared.applicationSupportsShakeToEdit = false
+    }
+    
+    private func setupMemoryWarningObserver() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleMemoryWarning()
+        }
+    }
+    
+    private func handleMemoryWarning() {
+        // Handle memory pressure gracefully
+        systemEventsHandler.cleanup()
     }
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
@@ -44,6 +76,16 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async -> UIBackgroundFetchResult {
         return await systemEventsHandler
             .appDidReceiveRemoteNotification(payload: userInfo)
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        // Perform cleanup when app enters background
+        systemEventsHandler.cleanup()
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        // Final cleanup
+        systemEventsHandler.cleanup()
     }
 }
 

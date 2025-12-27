@@ -42,9 +42,9 @@ extension AppEnvironment {
         let dbRepositories = configuredDBRepositories(modelContainer: modelContainer)
         let interactors = configuredInteractors(appState: appState, webRepositories: webRepositories, dbRepositories: dbRepositories)
         let diContainer = DIContainer(appState: appState, interactors: interactors)
-        let deepLinksHandler = RealDeepLinksHandler(container: diContainer)
-        let pushNotificationsHandler = RealPushNotificationsHandler(deepLinksHandler: deepLinksHandler)
-        let systemEventsHandler = RealSystemEventsHandler(
+        let deepLinksHandler = OptimizedDeepLinksHandler(container: diContainer)
+        let pushNotificationsHandler = OptimizedPushNotificationsHandler(deepLinksHandler: deepLinksHandler)
+        let systemEventsHandler = OptimizedSystemEventsHandler(
             container: diContainer,
             deepLinksHandler: deepLinksHandler,
             pushNotificationsHandler: pushNotificationsHandler,
@@ -58,11 +58,11 @@ extension AppEnvironment {
 
     private static func configuredURLSession() -> URLSession {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 60
-        configuration.timeoutIntervalForResource = 120
+        configuration.timeoutIntervalForRequest = AppConfiguration.API.Timeout.request
+        configuration.timeoutIntervalForResource = AppConfiguration.API.Timeout.resource
         configuration.waitsForConnectivity = true
-        configuration.httpMaximumConnectionsPerHost = 5
-        configuration.requestCachePolicy = .returnCacheDataElseLoad
+        configuration.httpMaximumConnectionsPerHost = AppConfiguration.Network.maxConnectionsPerHost
+        configuration.requestCachePolicy = AppConfiguration.Network.cachePolicy
         configuration.urlCache = .shared
         return URLSession(configuration: configuration)
     }
@@ -85,7 +85,9 @@ extension AppEnvironment {
         do {
             return try ModelContainer.appModelContainer()
         } catch {
-            // Log the error
+            #if DEBUG
+            print("⚠️ Failed to initialize ModelContainer: \(error.localizedDescription)")
+            #endif
             return ModelContainer.stub
         }
     }

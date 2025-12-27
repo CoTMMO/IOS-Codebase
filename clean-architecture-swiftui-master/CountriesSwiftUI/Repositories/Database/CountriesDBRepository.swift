@@ -30,24 +30,20 @@ extension MainDBRepository: CountriesDBRepository {
     func store(countries: [ApiModel.Country]) async throws {
         try modelContext.transaction {
             countries
-                .map { $0.dbModel() }
-                .forEach {
-                    modelContext.insert($0)
-                }
+                .map(CountryMapper.map)
+                .forEach(modelContext.insert)
         }
     }
 
     func store(countryDetails: ApiModel.CountryDetails, for country: DBModel.Country) async throws {
         let alpha3Code = country.alpha3Code
         try modelContext.transaction {
-            let currencies = countryDetails.currencies.map { $0.dbModel() }
+            let currencies = countryDetails.currencies.map(CurrencyMapper.map)
             let neighborsFetch = FetchDescriptor(predicate: #Predicate<DBModel.Country> { countryDBModel in
                 countryDetails.borders?.contains(countryDBModel.alpha3Code) == true
             })
             let neighbors = try modelContext.fetch(neighborsFetch)
-            currencies.forEach {
-                modelContext.insert($0)
-            }
+            currencies.forEach(modelContext.insert)
             let object = DBModel.CountryDetails(
                 alpha3Code: alpha3Code,
                 capital: countryDetails.capital,
@@ -58,16 +54,3 @@ extension MainDBRepository: CountriesDBRepository {
     }
 }
 
-internal extension ApiModel.Country {
-    func dbModel() -> DBModel.Country {
-        return .init(name: name, translations: translations,
-                     population: population, flag: flag,
-                     alpha3Code: alpha3Code)
-    }
-}
-
-internal extension ApiModel.Currency {
-    func dbModel() -> DBModel.Currency {
-        return .init(code: code, symbol: symbol, name: name)
-    }
-}

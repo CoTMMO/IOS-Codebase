@@ -14,13 +14,17 @@ struct ErrorView: View {
     
     var body: some View {
         VStack {
-            Text("An Error Occured")
+            Text(LocalizedStrings.Common.error)
                 .font(.title)
             Text(error.localizedDescription)
                 .font(.callout)
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 40).padding()
-            Button(action: retryAction, label: { Text("Retry").bold() })
+                .padding(.bottom, 40)
+                .padding()
+            Button(action: retryAction) {
+                Text(LocalizedStrings.Common.retry)
+                    .bold()
+            }
         }
     }
 }

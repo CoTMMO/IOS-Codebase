@@ -20,7 +20,7 @@ struct RealCountriesWebRepository: CountriesWebRepository {
 
     init(session: URLSession) {
         self.session = session
-        self.baseURL = "https://restcountries.com/v2"
+        self.baseURL = AppConfiguration.API.baseURL
     }
 
     func countries() async throws -> [ApiModel.Country] {
@@ -49,7 +49,7 @@ extension RealCountriesWebRepository.API: APICall {
     var path: String {
         switch self {
         case .allCountries:
-            return "/all?fields=name,translations,population,flag,alpha3Code"
+            return "/all?fields=\(AppConfiguration.API.Fields.countryList)"
         case let .countryDetails(countryName):
             let encodedName = countryName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
             return "/name/\(encodedName ?? countryName)"
@@ -62,7 +62,7 @@ extension RealCountriesWebRepository.API: APICall {
         }
     }
     var headers: [String: String]? {
-        return ["Accept": "application/json"]
+        return ["Accept": AppConfiguration.API.acceptHeader]
     }
     func body() throws -> Data? {
         return nil
