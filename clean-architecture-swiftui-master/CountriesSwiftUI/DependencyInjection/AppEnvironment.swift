@@ -42,9 +42,9 @@ extension AppEnvironment {
         let dbRepositories = configuredDBRepositories(modelContainer: modelContainer)
         let interactors = configuredInteractors(appState: appState, webRepositories: webRepositories, dbRepositories: dbRepositories)
         let diContainer = DIContainer(appState: appState, interactors: interactors)
-        let deepLinksHandler = RealDeepLinksHandler(container: diContainer)
-        let pushNotificationsHandler = RealPushNotificationsHandler(deepLinksHandler: deepLinksHandler)
-        let systemEventsHandler = RealSystemEventsHandler(
+        let deepLinksHandler = OptimizedDeepLinksHandler(container: diContainer)
+        let pushNotificationsHandler = OptimizedPushNotificationsHandler(deepLinksHandler: deepLinksHandler)
+        let systemEventsHandler = OptimizedSystemEventsHandler(
             container: diContainer,
             deepLinksHandler: deepLinksHandler,
             pushNotificationsHandler: pushNotificationsHandler,
